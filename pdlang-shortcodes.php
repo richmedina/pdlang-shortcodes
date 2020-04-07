@@ -58,14 +58,11 @@ function pd_related_materials_func($atts, $content = null) {
  //    <a href="php echo esc_html($url);" >Download File</a>
 
 	$materials = get_field('materials');
-	
 	if( $materials ) {
 	    foreach( $materials as $p) {
-			$file = get_field('upload_material', $p->ID);
-			$link = $file['url'];
-			$stype = $file['subtype'];
-			$title = $file['title'];
-			$output .= "<a href='{$link}'>{$title}</a> ({$stype})";
+			$link = $p->supplementary_material_url;
+			$title = $p->post_title;
+			$output .= "<a href='{$link}'>{$title}</a>";
 		}
 	}
 	return $output;
@@ -80,8 +77,8 @@ function pd_tags_func($atts, $content = null) {
 	global $post;
 	$post = get_post($post->ID);
 	// setup_postdata($post);
-	$output = "";	
-	$terms = get_the_terms($post->ID, 'experience_tags', 'Topics ', ', ');
+	$output = "<div class='tags'>";	
+	$terms = get_the_terms(get_the_ID(), 'experience_tags','', '');
 	if( $terms ) {
 	    foreach( $terms as $p) {
 	    	$name = $p->name;
@@ -89,6 +86,29 @@ function pd_tags_func($atts, $content = null) {
 	    	$output .= "<a href='{$link}'>{$name}</a>";
 	    }
 	}
+	$output .= "</div>";
+	return $output;
+}
+
+//[pd_series_tags]
+add_shortcode('pd_series_tags', 'pd_tags_series_func');
+function pd_tags_series_func($atts, $content = null) {
+	global $post;
+	$post = get_post($post->ID);
+	// setup_postdata($post);
+	$output = "<div>";	
+	$terms = get_the_terms(get_the_ID(), 'series','', '');
+	$len = count($terms);
+	if( $terms ) {
+	    foreach( $terms as $idx => $p) {
+	    	$name = $p->name;
+	    	$link = get_term_link($p);
+	    	$output .= "<a href='{$link}'>{$name}</a>";
+	    	if ($idx === $len - 2) $output .= " & ";
+            else if ($idx < $len -1) $output .= ", ";   	
+	    }
+	}
+	$output .= "</div>";
 	return $output;
 }
 
