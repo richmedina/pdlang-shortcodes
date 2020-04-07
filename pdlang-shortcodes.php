@@ -28,11 +28,11 @@ function pd_presenters_func($atts, $content = null) {
 	global $post;
 	$post = get_post($post->ID);
 	setup_postdata($post);	
-	$posts = get_field('presenters__authors_relation');
+	$posts = get_field('presenters__facilitators_relation');
 	$output = '';
 	if( $posts ) {
 	    foreach( $posts as $p) {
-	    	$name = get_field('full_name', $p->ID);
+	    	$name = $p->post_title;
 	    	$affiliation = get_field('affiliation', $p->ID);
 	    	$position = get_field('position', $p->ID);
 	    	$link = get_permalink($p->ID);
@@ -89,8 +89,69 @@ function pd_tags_func($atts, $content = null) {
 	    	$output .= "<a href='{$link}'>{$name}</a>";
 	    }
 	}
-
-	
 	return $output;
 }
 
+//[pd_exps]
+add_shortcode('pd_exps', 'pd_exps_func');
+function pd_exps_func($atts, $content = null) {
+	global $post;
+	var_dump($post);
+	$output = "";
+	while( have_posts()) {
+		the_post();
+		$img = the_post_thumbnail();
+		$title = $post->post_title;
+		$presenters = get_field('presenters__authors_relation');
+		$blurb = get_field('resource_description');
+		$trim = wp_trim_words($blurb, 20, ' ...');
+		$tags = the_terms( get_the_ID(), 'experience_tags', '', ', ');
+
+		$output .= '<article class="card-wrap-row">';
+		$output .= "<div class='image'><img src='{$img}'></div><div class='card'>";
+		$output .= "<header class='card-header'>";
+		$output .= "<h1 class='card-title'>{$title}</h1>";
+		
+
+		if( $presenters ) {
+			$output .= "<p class='card-meta'>";
+		    foreach( $presenters as $p) {
+		    	$name = get_field('full_name', $p->ID);
+		    	$link = get_permalink($p->ID);
+		    	$output .= "<span><a href='{$link}'>{$name}</a> </span>";
+		    }
+		    $output .= "<\p>";
+		}	
+		
+		$output .= "<p class='card-body'>{$trim}</p>";
+		$output .= "<footer class='card-footer'>";
+		if( $tags ) {
+		    foreach( $tags as $p) {
+		    	$name = $p->name;
+		    	$link = get_term_link($p);
+		    	$output .= "<span><a href='{$link}' class=''>{$name}</a><span>";
+		    }
+		}
+		$output .= "</footer>";
+		$output .="</article>";
+	}
+	return $output;
+}
+
+// <article class="card-wrap-row">
+// <div class="image"><img src="1.jpg"></div>
+// <div class="card">
+//   <header class="card-header">
+//     <h1 class="card-title">Python Essentials for Studies in human language and technology</h1>
+//     <p class="card-meta">
+//       <span>Bob Dylan</span>
+//       <span>March 31, 2020</span>
+//       <span>Info</span>
+//     </p>
+//   </header>
+//   <p class="card-body">
+//     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut labore et dolore magna aliqua.
+//   </p>
+//   <footer class="card-footer"><span>tag</span> <span>tag</span> <span>tag</span></footer>
+// </div>
+// </article>
