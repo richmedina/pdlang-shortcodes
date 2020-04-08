@@ -68,6 +68,28 @@ function pd_related_materials_func($atts, $content = null) {
 	return $output;
 }
 
+//[pd_sponsors]
+add_shortcode('pd_sponsors', 'pd_sponsors_func');
+function pd_sponsors_func($atts, $content = null) {
+	global $post;
+	$post = get_post($post->ID);
+	setup_postdata($post);
+	$output = "";
+	$sponsors = get_field('sponsor');
+	
+	if( $sponsors ) {
+		$len = count($sponsors);
+	    foreach( $sponsors as $idx => $p) {
+			$link = get_permalink($p->ID);;
+			$title = $p->post_title;
+			$output .= "<a href='{$link}' target='_blank'>{$title}</a>";
+			if ($idx === $len - 2) $output .= " & ";
+            else if ($idx < $len -1) $output .= ", ";   	
+
+		}
+	}
+	return $output;
+}
 //[pd_title]
 add_shortcode( 'pd_title', 'get_the_title' );
 
@@ -98,8 +120,8 @@ function pd_tags_series_func($atts, $content = null) {
 	// setup_postdata($post);
 	$output = "<div>";	
 	$terms = get_the_terms(get_the_ID(), 'series','', '');
-	$len = count($terms);
 	if( $terms ) {
+		$len = count($terms);
 	    foreach( $terms as $idx => $p) {
 	    	$name = $p->name;
 	    	$link = get_term_link($p);
@@ -112,11 +134,34 @@ function pd_tags_series_func($atts, $content = null) {
 	return $output;
 }
 
+//[pd_related_exps]
+// add_shortcode('pd_related_exps', 'pd_related_exps_func');
+// function pd_related_exps_func($atts, $content = null) {
+// 	global $post;
+// 	var_dump($post->title);
+// 	$args = array(
+// 	    // 'numberposts'   	=> -1,
+// 	    'post_type'      	=> array( 'experience'),
+// 	    'meta_query'     	=> array('key'=>$post,'in'=>'=','value'=>'presenters__facilitators_relation'),
+// 	    'meta_key'       	=> $post,
+// 	    // 'orderby'			=> 'meta_value_num',
+// 	    // 'order'   			=> 'ASC',
+// 	    // 'posts_per_page' 	=> 70,
+
+// 	);
+// 	$posts = new WP_Query($args);
+
+// 	if ( $posts->have_posts() ) {
+// 	    $output = "hello";
+// 	    while ( $posts->have_posts() ) {}
+// 	}
+// 	return $output;
+// }
+
 //[pd_exps]
 add_shortcode('pd_exps', 'pd_exps_func');
 function pd_exps_func($atts, $content = null) {
 	global $post;
-	var_dump($post);
 	$output = "";
 	while( have_posts()) {
 		the_post();
