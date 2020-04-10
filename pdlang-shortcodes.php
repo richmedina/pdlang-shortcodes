@@ -8,6 +8,82 @@
  */
 //pdlang-shortcodes.php
 
+// Include to add access to the ACF functions. Necessary for querying reverse relationships.
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+function pd_exp_html_blk_sm($p, $show_thumb=true, $show_blurb=false) {
+	setup_postdata( $p );
+	// $related_exps->the_post();
+	// var_dump($p->post_title);
+	$title = $p->post_title;
+	$link = get_permalink($p->ID);
+	$access_link = get_field('url_website', $p->ID);
+	$resource_type = get_field('pd_resource', $p->ID)[0];
+	$description = get_field('resource_description', $p->ID);
+	$description = wp_trim_words($description, 20, ' ...');
+	$thumb = get_the_post_thumbnail($p);
+	$mod_date = get_the_modified_date('', $p->ID);
+	$start_date = get_field('start_date', $p->ID);
+	$people = get_field('presenters__facilitators_relation', $p->ID);
+	$series = get_the_terms( $p->ID, 'series', 'Part of ', ', ');
+	$tags = get_the_terms( $p->ID, 'experience_tags', ' ', ', ');
+	
+	$html = "<article class='card-wrap-row flip'>";
+	$html .= "<div class='card'>";
+	$html .= "<header class='card-header'>";
+	$html .= "<h4 class='card-title'><a href='{$link}'>{$title}</a></h4>";
+	$html .= "<a href='{$access_link}' target='_blank'><span class='label lbl-blu pd_resource_label'>{$resource_type}</span></a>";
+	$html .= "";
+
+    if( $people ) {
+		$html .= " by ";
+		$len = count($people);
+		foreach( $people as $idx => $ppl) {
+			$pname = $ppl->post_title;
+			$plink = get_permalink($ppl->ID);
+			$html .= "<span><a href='{$plink}'>{$pname}</a>";
+			if ($idx === $len - 2) $html .= " & ";
+			else if ($idx < $len -1) $html .= ", ";
+			$html .= "</span>";
+		}
+    }
+    $html .= "<div><time>{$start_date}</time>  <time class='mod-date'>Updated {$mod_date}</time></div>";
+	$html .= "</header>";
+	
+	if( $show_blurb ) $html .= "<div class='card-body'>{$description}</div>";
+	
+	$html .= "<footer class='card-footer'>";
+	if( $series ) {
+		$html .= "<div class='tag-series'>Part of ";
+		$len = count($series);
+	    foreach( $series as $idx => $t) {
+	    	$name = $t->name;
+	    	$link = get_term_link($t);
+	    	$html .= "<a href='{$link}'>{$name}</a>";
+	        if ($idx === $len - 2) $html .= " & ";
+	        else if ($idx < $len -1) $html .= ", ";
+	    }
+	    $html .= "</div>";
+	}
+	if( $tags ) {
+		$html .= "<div class='tags'>";
+		$len = count($tags);
+	    foreach( $tags as $idx => $t) {
+	    	$name = $t->name;
+	    	$link = get_term_link($t);
+	    	$html .= "<a href='{$link}'>{$name}</a>";
+	    }
+	    $html .= "</div>";
+	}	
+	$html .= "</footer>"; //END footer
+	$html .= "</div>"; //END card
+	if( $show_thumb ) $html .= "<aside class='card-wrap-sidebar'><a href='the_permalink()'>{$thumb}</a> </aside>";
+	
+	$html .= "</article>";
+
+	return $html;
+}
+
 //[pd_dateblock]
 add_shortcode( 'pd_dateblock', 'pd_dateblock_func' );
 function pd_dateblock_func($atts, $content = null) {
@@ -29,6 +105,7 @@ function pd_presenters_func($atts, $content = null) {
 	$post = get_post($post->ID);
 	setup_postdata($post);	
 	$posts = get_field('presenters__facilitators_relation');
+
 	$output = '';
 	if( $posts ) {
 	    foreach( $posts as $p) {
@@ -50,13 +127,6 @@ function pd_related_materials_func($atts, $content = null) {
 	$post = get_post($post->ID);
 	setup_postdata($post);
 	$output = "";
-	// $file = get_field('materials');
-	// if( $file ) {
- //    	$url = wp_get_attachment_url( $file );
- //    	var_dump($file);
-	// }
- //    <a href="php echo esc_html($url);" >Download File</a>
-
 	$materials = get_field('materials');
 	if( $materials ) {
 	    foreach( $materials as $p) {
@@ -134,29 +204,32 @@ function pd_tags_series_func($atts, $content = null) {
 	return $output;
 }
 
-//[pd_related_exps]
-// add_shortcode('pd_related_exps', 'pd_related_exps_func');
-// function pd_related_exps_func($atts, $content = null) {
-// 	global $post;
-// 	var_dump($post->title);
-// 	$args = array(
-// 	    // 'numberposts'   	=> -1,
-// 	    'post_type'      	=> array( 'experience'),
-// 	    'meta_query'     	=> array('key'=>$post,'in'=>'=','value'=>'presenters__facilitators_relation'),
-// 	    'meta_key'       	=> $post,
-// 	    // 'orderby'			=> 'meta_value_num',
-// 	    // 'order'   			=> 'ASC',
-// 	    // 'posts_per_page' 	=> 70,
+// [pd_person_exp_relation]
+add_shortcode('pd_person_exp_relation', 'pd_person_exp_relation_func');
+function pd_person_exp_relation_func($atts, $content = null) {
+	global $post;
+	$args = array(
+	    'numberposts'  	=> -1,
+	    'post_type'		=> 'experience',
+	    'posts_per_page'=> -1,
+	    'meta_query'   	=> array( 
+	    	array(
+	    		'key'	 =>'presenters__facilitators_relation',
+	    		'value'	 =>'"'. $post->ID .'"', 
+	    		'compare'=>'LIKE',
+	    	)
+	    ),
+	);
+	$related_exps = get_posts($args);
+	$output = "";
+	if ( $related_exps ) {	    
+	    foreach ( $related_exps as $p ) {
+	    	$output .= pd_exp_html_blk_sm($p, true, false);
+		}
+	}
 
-// 	);
-// 	$posts = new WP_Query($args);
-
-// 	if ( $posts->have_posts() ) {
-// 	    $output = "hello";
-// 	    while ( $posts->have_posts() ) {}
-// 	}
-// 	return $output;
-// }
+	return $output;
+}
 
 //[pd_exps]
 add_shortcode('pd_exps', 'pd_exps_func');
