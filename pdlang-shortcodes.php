@@ -32,7 +32,11 @@ function pd_exp_html_blk_sm($p, $show_thumb=true, $show_blurb=false) {
 	$html .= "<div class='card'>";
 	$html .= "<header class='card-header'>";
 	$html .= "<h4 class='card-title'><a href='{$link}'>{$title}</a></h4>";
-	$html .= "<a href='{$access_link}' target='_blank'><span class='label lbl-blu pd_resource_label'>{$resource_type}</span></a>";
+	if($access_link) {
+		$html .= "<a href='{$access_link}' target='_blank'><span class='label lbl-blu pd_resource_label'>{$resource_type}</span></a>";
+	} else {
+		$html .= "<span class='label lbl-blu pd_resource_label'>{$resource_type}</span>";
+	}
 	$html .= "";
 
     if( $people ) {
