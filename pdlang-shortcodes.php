@@ -131,7 +131,7 @@ function pd_related_materials_func($atts, $content = null) {
 	if( $materials ) {
 		$urls = explode(";", $materials);	
 	    foreach( $urls as $link) {
-			$output .= " <a href='{$link}'>[{$link}]</a> ";
+			$output .= " [<a href='{$link}'>{$link}</a>] ";
 		}
 	}
 	return $output;
