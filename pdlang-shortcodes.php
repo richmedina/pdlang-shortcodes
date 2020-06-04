@@ -129,10 +129,9 @@ function pd_related_materials_func($atts, $content = null) {
 	$output = "";
 	$materials = get_field('materials');
 	if( $materials ) {
-	    foreach( $materials as $p) {
-			$link = $p->supplementary_material_url;
-			$title = $p->post_title;
-			$output .= "<a href='{$link}'>{$title}</a>";
+		$urls = explode(";", $materials);	
+	    foreach( $urls as $link) {
+			$output .= "<a href='{$link}'>{$link}</a>";
 		}
 	}
 	return $output;
@@ -276,20 +275,3 @@ function pd_exps_func($atts, $content = null) {
 	return $output;
 }
 
-// <article class="card-wrap-row">
-// <div class="image"><img src="1.jpg"></div>
-// <div class="card">
-//   <header class="card-header">
-//     <h1 class="card-title">Python Essentials for Studies in human language and technology</h1>
-//     <p class="card-meta">
-//       <span>Bob Dylan</span>
-//       <span>March 31, 2020</span>
-//       <span>Info</span>
-//     </p>
-//   </header>
-//   <p class="card-body">
-//     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ut labore et dolore magna aliqua.
-//   </p>
-//   <footer class="card-footer"><span>tag</span> <span>tag</span> <span>tag</span></footer>
-// </div>
-// </article>
