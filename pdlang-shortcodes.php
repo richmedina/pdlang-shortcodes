@@ -167,9 +167,11 @@ function pd_sponsors_func($atts, $content = null) {
 add_shortcode( 'pd_title', 'get_the_title' );
 
 //[pd_access_url]
-add_shortcode('pd_access_url', pd_access_url_func);
+add_shortcode('pd_access_url', 'pd_access_url_func');
 function pd_access_url_func($atts, $content = null) {
-	return get_field('access_url');
+	global $post;
+	setup_postdata($post);
+	return get_field('url_website');
 }
 
 //[pd_tags]
