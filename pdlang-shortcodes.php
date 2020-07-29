@@ -166,6 +166,12 @@ function pd_sponsors_func($atts, $content = null) {
 //[pd_title]
 add_shortcode( 'pd_title', 'get_the_title' );
 
+//[pd_access_url]
+add_shortcode('pd_access_url', pd_access_url_func);
+function pd_access_url_func($atts, $content = null) {
+	get_field('access_url');
+}
+
 //[pd_tags]
 add_shortcode('pd_tags', 'pd_tags_func');
 function pd_tags_func($atts, $content = null) {
