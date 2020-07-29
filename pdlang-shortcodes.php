@@ -169,7 +169,7 @@ add_shortcode( 'pd_title', 'get_the_title' );
 //[pd_access_url]
 add_shortcode('pd_access_url', pd_access_url_func);
 function pd_access_url_func($atts, $content = null) {
-	get_field('access_url');
+	return get_field('access_url');
 }
 
 //[pd_tags]
