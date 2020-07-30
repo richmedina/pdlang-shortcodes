@@ -171,7 +171,9 @@ add_shortcode('pd_access_url', 'pd_access_url_func');
 function pd_access_url_func($atts, $content = null) {
 	global $post;
 	setup_postdata($post);
-	return get_field('url_website');
+	$url = get_field('url_website');
+	$output = "<a href='{$url}' target='_blank'> {$url} </a>";
+	return $output;
 }
 
 //[pd_tags]
