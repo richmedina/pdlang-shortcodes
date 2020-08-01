@@ -155,7 +155,7 @@ function pd_sponsors_func($atts, $content = null) {
 	    foreach( $sponsors as $idx => $p) {
 			$link = get_permalink($p->ID);;
 			$title = $p->post_title;
-			$output .= "<a href='{$link}' target='_blank'>{$title}</a>";
+			$output .= "<a href='{$link}'>{$title}</a>";
 			if ($idx === $len - 2) $output .= " & ";
             else if ($idx < $len -1) $output .= ", ";   	
 
