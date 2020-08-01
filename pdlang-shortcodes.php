@@ -174,7 +174,7 @@ function pd_time_meta_func($atts, $content = null) {
 	$pub = get_the_date();
 	$mod = get_the_modified_date();
 	$author = get_the_author();
-	$output = "<i>Published: {$pub} by {$author} &bull; Updated: {$mod}</i>";
+	$output = "<div class='exp-publish-meta'>Published {$pub} by {$author} &bull; Updated {$mod}</div>";
 	return $output;
 }
 
