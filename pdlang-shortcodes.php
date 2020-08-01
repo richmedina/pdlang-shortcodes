@@ -170,8 +170,11 @@ add_shortcode( 'pd_title', 'get_the_title' );
 //[pd_time_meta]
 add_shortcode( 'pd_time_meta', 'pd_time_meta_func' );
 function pd_time_meta_func($atts, $content = null) {
-	$p = the_post();
-	$output = "<div>Published {$p->post_date} </div>";
+	global $post;
+	$pub = get_the_date();
+	$mod = get_the_modified_date();
+	$author = get_the_author();
+	$output = "<i>Published: {$pub} by {$author} &bull; Updated: {$mod}</i>";
 	return $output;
 }
 
