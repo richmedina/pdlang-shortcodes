@@ -18,7 +18,7 @@ function pd_exp_html_blk_sm($p, $show_thumb=true, $show_blurb=false) {
 	$title = $p->post_title;
 	$link = get_permalink($p->ID);
 	$access_link = get_field('url_website', $p->ID);
-	$resource_type = get_field('pd_resource', $p->ID)[0];
+	$resource_type = get_field('pd_resource', $p->ID);
 	$description = get_field('resource_description', $p->ID);
 	$description = wp_trim_words($description, 20, ' ...');
 	$thumb = get_the_post_thumbnail($p);
